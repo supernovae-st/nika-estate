@@ -65,8 +65,8 @@ A projection may be **old, but never wrong** — the system fails closed.
 | [nika-registry](https://github.com/supernovae-st/nika-registry) | `estate.yaml` | 1 · per-file rows | **merged** |
 | [nika](https://github.com/supernovae-st/nika) (engine) | `estate.yaml` | 2 · glob patterns | [PR #689](https://github.com/supernovae-st/nika/pull/689) |
 | [nika-docs](https://github.com/supernovae-st/nika-docs) | `estate.yaml` | 1 · per-file rows | [PR #116](https://github.com/supernovae-st/nika-docs/pull/116) |
-| [nika-spec](https://github.com/supernovae-st/nika-spec) | [PR #165](https://github.com/supernovae-st/nika-spec/pull/165) | 2 | 1106 |
-| [nika.sh](https://github.com/supernovae-st/nika.sh) | `estate.yaml` | — | in flight |
+| [nika-spec](https://github.com/supernovae-st/nika-spec) | `estate.yaml` | 2 · glob patterns | [PR #165](https://github.com/supernovae-st/nika-spec/pull/165) |
+| [nika.sh](https://github.com/supernovae-st/nika.sh) | `estate.yaml` | 2 · glob patterns | [PR #365](https://github.com/supernovae-st/nika.sh/pull/365) |
 
 All manifests run in **observation mode**: they declare what IS and
 enforce nothing yet. Observation before enforcement — the estate earns
