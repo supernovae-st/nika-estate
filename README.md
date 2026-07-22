@@ -9,7 +9,7 @@
 
 # nika-estate
 
-**The estate of the Nika ecosystem — every file's provenance, declared,
+**The estate of the Nika ecosystem: every file's provenance, declared,
 sealed, anchored. The hundred-year machinery.**
 
 One law governs every artifact in the ecosystem:
@@ -17,7 +17,7 @@ One law governs every artifact in the ecosystem:
 > Every artifact is **AUTHORED bytes** or a **proven derivation**
 > `(hashed inputs, tool, pin) → output + proof`. The closure of all
 > derivations folds to **one root hash** · anchored publicly ·
-> verifiable in 2126 with sha256 and a ~100-line script — no living
+> verifiable in 2126 with sha256 and a ~100-line script, no living
 > institution required, including us.
 
 Most projects answer "where does this file come from?" with tribal
@@ -30,7 +30,7 @@ it on every PR.
 
 ## Verify today
 
-The manifests are live in the pilot repos — each one checks in seconds:
+The manifests are live in the pilot repos; each one checks in seconds:
 
 ```sh
 git clone https://github.com/supernovae-st/nika-registry && cd nika-registry
@@ -44,19 +44,19 @@ contract is in [`SCHEMA.md`](SCHEMA.md).
 ## The three layers
 
 ```
-LAYER 1 · THE MANIFEST    estate.yaml, per repo — every tracked file declares
+LAYER 1 · THE MANIFEST    estate.yaml, per repo · every tracked file declares
                           its class + the evidence it was read from; derived
                           files carry {tool · gate · hashed inputs}
-LAYER 2 · THE ROOT        estate.lock — the closure of every per-repo manifest
+LAYER 2 · THE ROOT        estate.lock · the closure of every per-repo manifest
                           folds to ONE root hash (lands here · E2)
 LAYER 3 · THE ANCHOR      a signed checkpoint per root mutation (minisign ·
                           C2SP note), anchored on public transparency rails
-                          (Rekor v2 · RFC 3161) — detection without trust
+                          (Rekor v2 · RFC 3161) · detection without trust
 ```
 
 A repo never blocks on the estate: per-repo manifests compose, the root
 advances by heal-PR, and a red gate simply means the head does not move.
-A projection may be **old, but never wrong** — the system fails closed.
+A projection may be **old, but never wrong**: the system fails closed.
 
 ## Current state
 
@@ -69,7 +69,7 @@ A projection may be **old, but never wrong** — the system fails closed.
 | [nika.sh](https://github.com/supernovae-st/nika.sh) | `estate.yaml` | 2 · glob patterns | [PR #365](https://github.com/supernovae-st/nika.sh/pull/365) |
 
 All manifests run in **observation mode**: they declare what IS and
-enforce nothing yet. Observation before enforcement — the estate earns
+enforce nothing yet. Observation before enforcement: the estate earns
 its gate.
 
 ## What lands here next
@@ -77,9 +77,9 @@ its gate.
 | Piece | What | Phase |
 |---|---|---|
 | `estate.lock` | the per-repo manifests fold to one signed root hash · checkpoint per mutation | E2 |
-| the runner | a `.nika.yaml` derivation engine — the manifests drive re-derivation and heal-PRs, run by the language the estate describes | E1 |
-| the minimal verifier | sha256 + ~100 independent lines, **never nika itself** — a proof nobody can re-check by hand is a promise, not a proof | E2+ |
-| `SUCCESSION.md` | the succession clause as data — see the [stub](SUCCESSION.md) | pending |
+| the runner | a `.nika.yaml` derivation engine: the manifests drive re-derivation and heal-PRs, run by the language the estate describes | E1 |
+| the minimal verifier | sha256 + ~100 independent lines, **never nika itself**: a proof nobody can re-check by hand is a promise, not a proof | E2+ |
+| `SUCCESSION.md` | the succession clause as data · see the [stub](SUCCESSION.md) | pending |
 
 ## License
 
