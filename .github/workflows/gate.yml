@@ -1,0 +1,20 @@
+name: gate
+
+# Placeholder rail. estate.lock lands at E2; this gate then verifies the
+# closure (re-fold the per-repo manifests → byte-compare the root hash).
+# Until then the single step below documents the contract and always passes.
+#
+# SECURITY: no github.event data reaches the shell (house convention).
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "estate.lock lands at E2 — this gate will verify the closure"
