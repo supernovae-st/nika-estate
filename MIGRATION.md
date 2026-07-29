@@ -100,19 +100,50 @@ helpers (`spec_pin_rev`, `engine_version`, `index_artifact_keys`,
 files that were silently misclassified because the four-class vocabulary had
 no word for them. Those findings are the point, not an obstacle.
 
-## Step 3 · the gate
+## Step 3 · the gate, and why it matters more than it looks
 
 Once every repo runs the mirror, the drift gate compares the local
 `scripts/estate.py` against this repo's copy at the pinned rev, exactly like
 the spec pack. Until then the mirror is a convention, and a convention is not
 a gate.
 
+That distinction is not academic. Applying step 1 surfaced something nobody
+had seen: **both manifests were already stale at HEAD.** The engine declared
+4210 classified files against 4213 real; the spec declared 1256 against 1258.
+Running the original tool at an untouched checkout returned exit 5 in both.
+
+The reason nobody noticed is written in the workflow:
+
+```yaml
+on:
+  pull_request          # never on push
+continue-on-error: true # never blocks
+```
+
+That is correct for E0, and it is exactly why E0 cannot be the resting state.
+A gate that observes and never speaks is indistinguishable from no gate at
+all once the humans stop reading its logs. Step 3 is not "add enforcement
+later" · it is the step that makes every step before it mean something.
+
+Anyone re-running the migration should expect part of their diff to be
+absorbed pre-existing drift, and should attribute it explicitly rather than
+claim it. The bar is zero unexplained lines, not a small diff.
+
+### One trap, paid on the first attempt
+
+`tracked_index()` reads `git ls-files -s`, which is the **index**. A brand new
+`estate_rules.py` that has not been `git add`ed does not exist as far as the
+tool is concerned, so the manifest generates cleanly while silently omitting
+the file that was just created. Stage first, generate second, and verify with
+`--check` that the result is self-consistent before committing.
+
 ## Status
 
 - **Step 0** · the canonical tool lands here · **done 2026-07-29**
-- **Step 1** · the two schema-2 pilots mirror it · proven, not yet applied
+- **Step 1** · the two schema-2 pilots mirror it · **done 2026-07-29**
+  (`nika-spec` `bf9faf2` · `nika` `dcf67c99` · zero unexplained lines in either)
 - **Step 2** · the two schema-1 pilots migrate · not started
-- **Step 3** · byte-gate the mirror · blocked on steps 1 and 2
+- **Step 3** · byte-gate the mirror · blocked on step 2
 
 The estate stays in **observation mode** (E0) throughout. It declares what is;
 it enforces nothing until the manifests agree.
