@@ -68,19 +68,30 @@ The rules:
 
 ## The classes
 
+The six words below are the law. They live **here** and nowhere else:
+`scripts/estate.py` carries them verbatim in its `CLASSES` dict, and every
+repo runs a byte-identical copy of that file. A repo that re-words a
+definition to fit its own domain has forked the law without saying so, which
+is the exact failure this document exists to prevent. (It happened: on
+2026-07-29 three different wordings of `pinned-copy` and `testimonial` were
+found live, one here and one in each of the two schema-2 pilots. The wordings
+below are the reconciliation.)
+
 | Class | One line |
 |---|---|
 | `authored` | a human writes here |
-| `generated` | derived by a tool from declared inputs: regenerate, never hand-edit |
-| `pinned-copy` | byte-copy vendored from an upstream rev by a declared lane, integrity-gated |
-| `testimonial` | impl-owned test evidence · fixtures, corpora, batteries: proves behavior; neither shipped code nor derived output |
+| `authored-pin` | a hand-meaningful pin a bot lane advances via PR-only, never HEAD; the derivations' INPUT |
+| `generated` | derived by a tool from declared inputs, regenerate, never hand-edit |
+| `pinned-copy` | byte-copy vendored from an upstream source by a declared lane, provenance declared, integrity-gated |
+| `testimonial` | captured evidence · fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output |
 | `foreign` | pointer to a third-party sovereign source |
 
-Two refinements the pilots produced:
+`authored-pin` was a pilot refinement promoted into the law: the engine's
+`SPEC_PIN` is the canonical instance, a pin a human means and a bot may only
+advance through a pull request.
 
-- **`authored-pin`** · a hand-meaningful pin that a bot lane advances
-  PR-only, never HEAD. The derivations' INPUT (the engine's
-  `SPEC_PIN`).
+One shape is not a class:
+
 - **authored-with-note** · an authored file carrying a tool-maintained
   block (a status block, a bot-rewritten digest line). The class stays
   `authored`; a `note:` names the block and the lane that maintains it.

@@ -28,6 +28,21 @@ evidence, derived files carry their derivation (tool · gate · hashed
 inputs), and a drift gate re-emits the whole manifest and byte-compares
 it on every PR.
 
+## The tool lives here
+
+[`scripts/estate.py`](scripts/estate.py) is **the** implementation. Every repo
+that carries an estate runs a byte-identical copy of it; what stays per-repo is
+the data (`scripts/estate_rules.py`: the `FILES` exceptions and the ordered
+`PATTERNS`), because that genuinely describes that repo. Dependency-free by
+design: the hundred-year machinery has to run on a stock interpreter in 2126,
+with no package manager still alive to serve it.
+
+It was not always here. On 2026-07-29 a probe found the tool that enforces
+*"every fact has exactly one home"* living in four homes, two of them still on
+the previous schema and unable to name two of the law's own classes. The
+reconciliation, the proof it produced no unexplained drift, and the remaining
+steps are in [`MIGRATION.md`](MIGRATION.md).
+
 ## Verify today
 
 The manifests are live in the pilot repos; each one checks in seconds:
