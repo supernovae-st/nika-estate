@@ -191,4 +191,30 @@ mirror is no longer a convention to remember. It is a red build.
 
 The estate itself stays in **observation mode** (E0): it declares what is and
 enforces nothing about provenance. What is enforced is narrower and harder to
-argue with · that the tool doing the declaring is the tool everyone agreed on.
+argue with · that the tool doing the declaring is the tool everyone agreed on,
+and that the tool refuses what it claims to refuse.
+
+## What the verification pass found afterwards
+
+Ten adversarial mutations, each planted on a throwaway clone, each caught with
+the documented exit code. That battery is no longer a transcript: it is
+`scripts/selftest.py`, wired into this repo's gate on every push, and itself
+mutation-proven so it cannot quietly stop guarding anything.
+
+Running `--check` on **fresh clones of origin** rather than on the local tree
+then caught something the local trees could not show: `nika-spec` was at exit 5.
+The mirror-gate commit had changed a workflow file and the manifest was
+regenerated before that edit was staged, so the pattern aggregates, which read
+the git index, recorded the file as it was before the mirror job existed.
+Confirmed rather than assumed · restoring the pre-mirror workflow into the
+index reproduces the committed aggregate exactly. Fixed in `nika-spec f84dc20`.
+
+That was the same index trap as the rules file, in a second shape, inside one
+arc. The structural cause is named in the README under *One thing still
+undecided*: `files:` rows hash disk bytes, pattern aggregates hash index blobs.
+It is a real trade-off rather than an obvious bug, so it is written down for a
+decision instead of resolved unilaterally.
+
+**The lesson that generalises past this repo:** verify on a fresh clone of the
+remote, never on the tree you just worked in. The tree you worked in is the one
+place where your own mistake is invisible.

@@ -40,8 +40,48 @@ with no package manager still alive to serve it.
 It was not always here. On 2026-07-29 a probe found the tool that enforces
 *"every fact has exactly one home"* living in four homes, two of them still on
 the previous schema and unable to name two of the law's own classes. The
-reconciliation, the proof it produced no unexplained drift, and the remaining
-steps are in [`MIGRATION.md`](MIGRATION.md).
+reconciliation, the proof it produced no unexplained drift, and what each step
+cost are in [`MIGRATION.md`](MIGRATION.md).
+
+## It proves it says no
+
+A gate that returns 0 on a clean tree has proven nothing: so does `true`. What
+has to be proven is that it returns non-zero on each thing it claims to catch.
+
+```sh
+python3 scripts/selftest.py
+```
+
+builds a throwaway repository, plants one known violation at a time, and
+asserts the verdict: an edited file and an undeclared file are drift (5) · an
+uncovered file is a hole that **names** its offender (3) · a seventh class is
+refused (3) · missing rules are refused rather than silently declaring an empty
+estate (3) · a hand-edited manifest cannot outlive a re-emission (5) · a
+projection claim dies with the marker that proved it · duplicate and stale
+`files:` rows are caught before anything renders.
+
+The suite is itself mutation-proven, which is the part that matters. Removing
+the class validation from the tool kills exactly one case; silencing the
+coverage-hole check kills exactly one; making `--check` always return 0 kills
+three; restoring the tool byte for byte returns 10 of 10. **A suite that cannot
+fail proves nothing.** CI runs it on every push and every pull request.
+
+## One thing still undecided
+
+`files:` rows hash the **real bytes on disk**; pattern aggregates hash the
+**git index**. One file's provenance is therefore measured from two different
+sources depending on how it happens to be classified, and that asymmetry has
+already shipped drift twice: regenerate before staging an edit and the pattern
+side cannot see it.
+
+Both sides have a case. Index blobs are platform-independent (a repo with
+`.gitattributes text=auto` hands you different working-tree bytes on Windows)
+and cost no file reads. Real bytes see the working tree, which is deliberate
+for the generator's own row so it can classify itself before being committed.
+
+Picking one costs a single churn of every aggregate in four manifests. Until it
+is picked, the discipline is uniform and written down: **stage first, generate
+second, `--check` to confirm.**
 
 ## Verify today
 
