@@ -222,6 +222,34 @@ def t_stale_files_row(root):
     return (rc if "stale" in out.lower() else -1), 3
 
 
+def t_index_is_the_source(root):
+    """a files: row hashes what git STAGED, never what the disk happens to say
+
+    LICENSE on purpose: it is a files: ROW. README.md would pass this test for
+    the wrong reason, because it is a pattern match and pattern aggregates read
+    the index either way. The first version of this case used README.md and the
+    mutation run caught it: reverting the tool to disk-reading left the case
+    green. A test that cannot fail is decoration.
+    """
+    p = root / "LICENSE"
+    before = (root / "estate.yaml").read_text()
+    p.write_text(p.read_text() + "\nunstaged\n")          # NOT git add
+    rc, out = check(root, "--write")
+    after = (root / "estate.yaml").read_text()
+    # the manifest must be untouched, and the tool must SAY the disk differs
+    quiet = (before == after)
+    warned = "modified, not staged" in out and "LICENSE" in out
+    return (0 if (quiet and warned) else -1), 0
+
+
+def t_untracked_is_named(root):
+    """a file that was never added is invisible to the manifest · say so"""
+    (root / "docs" / "never-added.md").write_text("hello\n")
+    rc, out = check(root, "--write")
+    named = "untracked" in out and "never-added.md" in out
+    return (0 if named else -1), 0
+
+
 CASES = [
     ("clean tree in phase", t_clean),
     ("content edit is drift", t_content_edit),
@@ -233,6 +261,8 @@ CASES = [
     ("claim dies with its evidence", t_evidence_vanishes),
     ("duplicate files: row refused", t_duplicate_files_row),
     ("stale files: row refused", t_stale_files_row),
+    ("the index is the source, disk drift named", t_index_is_the_source),
+    ("an untracked file is named, not ignored", t_untracked_is_named),
 ]
 
 
