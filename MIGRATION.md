@@ -137,13 +137,58 @@ tool is concerned, so the manifest generates cleanly while silently omitting
 the file that was just created. Stage first, generate second, and verify with
 `--check` that the result is self-consistent before committing.
 
-## Status
+## What step 2 actually cost, and what it paid
 
-- **Step 0** · the canonical tool lands here · **done 2026-07-29**
-- **Step 1** · the two schema-2 pilots mirror it · **done 2026-07-29**
-  (`nika-spec` `bf9faf2` · `nika` `dcf67c99` · zero unexplained lines in either)
-- **Step 2** · the two schema-1 pilots migrate · not started
-- **Step 3** · byte-gate the mirror · blocked on step 2
+It was not mechanical, and the interesting part is what the richer vocabulary
+made sayable:
 
-The estate stays in **observation mode** (E0) throughout. It declares what is;
-it enforces nothing until the manifests agree.
+| repo | reclassified | why schema 1 could not say it |
+|---|---|---|
+| `nika-docs` | `LICENSE` · authored → **pinned-copy** | calling it authored claimed a human here wrote the GNU AGPL |
+| `nika-registry` | `SPEC_PIN` · authored → **authored-pin** | its own header reads "Bump deliberately: edit this"; it is the input every projection derives from |
+| `nika-registry` | `LICENSE` → **pinned-copy** | same as above, verbatim Apache text |
+| `nika-registry` | 3 shell completions → **generated**, gate NONE | clap output committed once inside a release-heal PR; nothing here re-derives them and the engine version behind their bytes is recorded nowhere |
+
+The registry did **not** become a pile of globs, and that was the right call.
+Every cert cites the artifact it certified, every projected entry cites the
+spec rev it came from, and a badge whose registry entry was deleted is a
+leftover projection nothing re-proves. None of that survives being flattened
+into one shared evidence string, so its rules module **computes** its rows.
+That is the shape to reach for: the tool is shared, the rules are code.
+
+Verified path by path against the schema-1 classification before either
+shipped · `nika-docs` 151 files, 148 identical · `nika-registry` 108 files,
+103 identical · zero coverage holes in either · every difference named above.
+
+### Three defects the comparison caught that reading would not have
+
+1. **`**/*.mdx` never matched a root-level page.** In this glob dialect `**`
+   expands to `.*`, so the pattern demands a slash. Every top-level `.mdx`
+   was silently falling through to the catch-all. Same trap in
+   `images/**/*.svg`. The forms that work are `**.mdx` and `images/**.svg`.
+2. **The honesty budget could shrink without anything becoming known.** The
+   `unverified` list was built from pattern rows only, so six bitmaps that
+   became computed `files:` rows quietly left it: 23 became 18 with not one
+   file better understood. Both sources count now.
+3. **The generator littered the tree it measures.** Importing the rules
+   module makes Python write a `.pyc` beside it, and one reached a commit.
+   `sys.dont_write_bytecode` is set before the import now.
+
+## Status · all four steps closed 2026-07-29
+
+- **Step 0** · the canonical tool lands here · `ec8bb8d`
+- **Step 1** · the two schema-2 pilots mirror it · `nika-spec bf9faf2` ·
+  `nika dcf67c99` · zero unexplained lines in either
+- **Step 2** · the two schema-1 pilots migrate · `nika-docs 4ccdf81` ·
+  `nika-registry 5009e4a` · every reclassification named above
+- **Step 3** · byte-gate the mirror · `nika fc3f7aa8` · `nika-spec 449706f` ·
+  `nika-docs 33823be` · `nika-registry a51c6ba`
+
+Four repos, one tool, one vocabulary. `scripts/estate.py` is a `pinned-copy`
+in every one of them, `ESTATE_PIN` is the `authored-pin` the gate compares
+against, and the `mirror` job fails the run on any difference. Editing a
+mirror is no longer a convention to remember. It is a red build.
+
+The estate itself stays in **observation mode** (E0): it declares what is and
+enforces nothing about provenance. What is enforced is narrower and harder to
+argue with · that the tool doing the declaring is the tool everyone agreed on.
