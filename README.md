@@ -63,7 +63,8 @@ projection claim dies with the marker that proved it · duplicate and stale
 The suite is itself mutation-proven, which is the part that matters. Removing
 the class validation from the tool kills exactly one case; silencing the
 coverage-hole check kills exactly one; making `--check` always return 0 kills
-three; restoring the tool byte for byte returns 10 of 10. **A suite that cannot
+three; reverting the index read to a disk read kills the case that guards
+it, and restoring the tool byte for byte returns 12 of 12. **A suite that cannot
 fail proves nothing.** CI runs it on every push and every pull request.
 
 ## One question, one answer
@@ -89,8 +90,10 @@ estate.py: the manifest describes the INDEX, and your disk says something else:
 ```
 
 Two properties worth knowing. On a clean tree the index and the disk agree, so
-this changed **nothing**: re-deriving all four mirrored repos moved zero lines.
-And the warning is silent on a normal regeneration, including for `estate.yaml`
+this changed **nothing**: re-deriving `nika`, `nika-docs` and `nika-registry`
+moved zero lines. `nika-spec` moved nine, and the *old* tool moves the same
+nine on the same clone, so those are its own pre-existing drift rather than
+anything this introduced. And the warning is silent on a normal regeneration, including for `estate.yaml`
 itself, which `--write` modifies by definition and which would otherwise
 complain on every single run.
 
