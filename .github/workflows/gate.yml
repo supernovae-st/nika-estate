@@ -1,20 +1,49 @@
 name: gate
 
-# Placeholder rail. estate.lock lands at E2; this gate then verifies the
-# closure (re-fold the per-repo manifests → byte-compare the root hash).
-# Until then the single step below documents the contract and always passes.
+# This repo publishes a tool that four others mirror byte for byte. The thing
+# that must not regress is not the prose: it is that the tool REFUSES what it
+# claims to refuse. scripts/selftest.py builds a throwaway repository, plants
+# one known violation at a time, and asserts each verdict and exit code.
 #
-# SECURITY: no github.event data reaches the shell (house convention).
+# The suite is itself mutation-proven: removing the class validation from the
+# tool kills exactly one case, silencing the coverage-hole check kills exactly
+# one, and making --check always return 0 kills three. A case that stops
+# firing means a guarantee was removed.
+#
+# Runs on push as well as pull_request: main takes direct pushes here, and a
+# gate that only watches pull requests would not see one.
+#
+# estate.lock lands at E2; the closure job below is armed then.
+#
+# SECURITY: no github.event data reaches any shell (house convention). The one
+# expression here is github.ref in a concurrency key, never a run: argument.
 
 on:
   pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  gate:
+  selftest:
+    name: The tool refuses what it claims to refuse
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - run: echo "estate.lock lands at E2 — this gate will verify the closure"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: 10 planted violations, 10 expected verdicts
+        run: python3 scripts/selftest.py
+
+  closure:
+    name: The estate closure (E2, not yet armed)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo "estate.lock lands at E2 — this job will re-fold the manifests and byte-compare the root hash"
