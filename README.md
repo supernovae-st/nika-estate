@@ -20,6 +20,8 @@ One law governs every artifact in the ecosystem:
 > verifiable in 2126 with sha256 and a ~100-line script, no living
 > institution required, including us.
 
+![The ledger agrees with the tree, one staged edit diverges it, the gate refuses loud with the exact remedy, the restore brings them back in sync · recorded on a real carrier repo with the shared tool](media/the-bite.gif)
+
 Most projects answer "where does this file come from?" with tribal
 knowledge: a bot someone remembers, a script someone wrote, a pin
 someone bumps. The estate answers with a **manifest you re-derive
