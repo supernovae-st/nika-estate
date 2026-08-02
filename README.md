@@ -30,6 +30,18 @@ evidence, derived files carry their derivation (tool · gate · hashed
 inputs), and a drift gate re-emits the whole manifest and byte-compares
 it on every PR.
 
+## Try it first
+
+```sh
+git clone https://github.com/supernovae-st/nika-estate && cd nika-estate
+python3 scripts/selftest.py
+```
+
+One stock interpreter, zero dependencies, a few seconds: it builds a
+throwaway repository, plants twelve violations one at a time, and shows you
+the tool refusing each with its documented exit code. Nothing here asks to
+be believed · the refusals are the demo.
+
 ## The tool lives here
 
 [`scripts/estate.py`](scripts/estate.py) is **the** implementation. Every repo

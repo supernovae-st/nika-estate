@@ -13,7 +13,10 @@ name: gate
 # Runs on push as well as pull_request: main takes direct pushes here, and a
 # gate that only watches pull requests would not see one.
 #
-# estate.lock lands at E2; the closure job below is armed then.
+# estate.lock arms the closure job below. It is a later rung than E2:
+# E2 landed 2026-08-01 (nika.sh · the first building where drift BLOCKS)
+# and brought no lock. The ladder as lived: E0 observe · E1 mirror ·
+# E2 drift blocks · the closure folds every manifest to one root hash.
 #
 # SECURITY: no github.event data reaches any shell (house convention). The one
 # expression here is github.ref in a concurrency key, never a run: argument.
@@ -38,12 +41,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: 10 planted violations, 10 expected verdicts
+      - name: 12 planted violations, 12 expected verdicts
         run: python3 scripts/selftest.py
 
   closure:
-    name: The estate closure (E2, not yet armed)
+    name: The estate closure (estate.lock · not yet armed)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - run: echo "estate.lock lands at E2 — this job will re-fold the manifests and byte-compare the root hash"
+      - run: echo "estate.lock is a later rung than E2 · E2 landed 2026-08-01 (nika.sh, drift blocks) and brought no lock · when estate.lock lands, this job re-folds the manifests and byte-compares the root hash"
