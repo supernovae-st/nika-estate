@@ -52,7 +52,8 @@ patterns:
 The rules:
 
 - **Ordered, first-match-wins** · each tracked file is claimed by the
-  first pattern that matches it, and by nothing else.
+  first pattern that matches it, and by nothing else. Buckets belong to
+  rows: a later row with an identical glob has zero matches.
 - **`files:` exceptions win** · per-file rows (singletons: a pin, a
   lockfile, an authored file inside a generated zone) take precedence
   over every pattern.
@@ -96,7 +97,13 @@ One shape is not a class:
   block (a status block, a bot-rewritten digest line). The class stays
   `authored`; a `note:` names the block and the lane that maintains it.
 
-Derived classes owe a `derivation`. TESTIMONIAL and FOREIGN are leaves;
+Derived classes (`generated`, `pinned-copy`) owe a `derivation` in both
+`files:` and `patterns:` rows. It is a mapping with nonempty `tool` and
+`gate` strings and a nonempty list of nonempty `inputs` strings. Any
+supplied derivation must have that shape. Missing or malformed declarations
+are exit 3 and name their row. This validates the declaration, not whether
+the named gate runs or the inputs have been hashed into a closure proof.
+TESTIMONIAL and FOREIGN are leaves;
 they owe nothing to the root: impl tests belong to the impl, third-party
 artifacts stay sovereign at their publisher.
 
@@ -112,7 +119,7 @@ python3 scripts/estate.py --check   # re-emit · byte-compare · report
 |---|---|
 | 0 | in sync |
 | 2 | unknown mode |
-| 3 | coverage hole (schema 2): every uncovered path listed |
+| 3 | invalid or missing rules, stale file exception, or coverage hole (every uncovered path listed) |
 | 5 | drift: `estate.yaml` diverges from the tracked tree |
 
 Exit 5 follows the ssot-compiler convention, deliberately distinct
@@ -122,6 +129,11 @@ runs on the same tree are byte-identical.
 
 The generator always classifies itself; the manifest never lists itself
 (its sha256 cannot contain its own hash).
+
+Tracked membership and content hashes come from the index. An unstaged
+deletion does not make a staged `files:` entry stale; a staged deletion does.
+Rules still execute against the working tree, so classifications can depend
+on unstaged rules or evidence. See [the open index-classification defect](OPEN_DEFECTS.md).
 
 ## The evidence discipline
 
