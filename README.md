@@ -38,8 +38,8 @@ python3 scripts/selftest.py
 ```
 
 One stock interpreter, zero dependencies, a few seconds: it builds a
-throwaway repository, plants twelve violations one at a time, and shows you
-the tool refusing each with its documented exit code. Nothing here asks to
+throwaway repository, runs seventeen cases, and shows you the expected
+acceptance or refusal with its documented exit code. Nothing here asks to
 be believed · the refusals are the demo.
 
 ## The tool lives here
@@ -74,12 +74,17 @@ estate (3) · a hand-edited manifest cannot outlive a re-emission (5) · a
 projection claim dies with the marker that proved it · duplicate and stale
 `files:` rows are caught before anything renders.
 
-The suite is itself mutation-proven, which is the part that matters. Removing
-the class validation from the tool kills exactly one case; silencing the
-coverage-hole check kills exactly one; making `--check` always return 0 kills
-three; reverting the index read to a disk read kills the case that guards
-it, and restoring the tool byte for byte returns 12 of 12. **A suite that cannot
-fail proves nothing.** CI runs it on every push and every pull request.
+Repeated globs keep separate buckets, so only the first row claims their
+files. Missing or malformed derivations fail before either mode can write a
+manifest. An unstaged deletion preserves a staged file row; a staged deletion
+makes that exception stale.
+
+The suite is itself mutation-proven. The original twelve cases caught removed
+class and coverage validation, a check forced to return 0, and hashes read
+from disk. The added cases catch shared duplicate-glob buckets, removed
+derivation validation, and a stale-file check that depends on disk existence.
+Restoring the tool returns 17 of 17. **A suite that cannot fail proves nothing.**
+CI runs it on every push and every pull request.
 
 ## One question, one answer
 
@@ -92,12 +97,12 @@ answers depending on how it happened to be classified. That shipped drift
 twice in a single day: regenerate before staging an edit and the pattern side
 simply could not see it.
 
-The manifest reads the index throughout, and when the disk says something
+The content hashes read the index throughout, and when the disk says something
 else the tool says so rather than measuring a tree you are not about to
 commit:
 
 ```
-estate.py: the manifest describes the INDEX, and your disk says something else:
+estate.py: content hashes describe the INDEX, and your disk says something else:
   modified, not staged  scripts/estate_rules.py
   untracked             docs/new-page.md
   stage them first if they belong in this manifest (git add), then re-run.
@@ -113,3 +118,8 @@ complain on every single run.
 
 The generator still falls back to the disk for a path the index does not carry
 yet, which is how it classifies itself before it has ever been added.
+
+Classification has a separate, open limitation: per-repo Python rules still
+execute from disk and may read unstaged evidence. A marker edit can therefore
+change a class while its hash still describes the staged bytes. The exact
+refuter and the bounded follow-up are in [OPEN_DEFECTS.md](OPEN_DEFECTS.md).

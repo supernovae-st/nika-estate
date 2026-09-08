@@ -24,6 +24,7 @@ this before pushing. If a case stops firing, the change removed a guarantee.
 
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -222,6 +223,88 @@ def t_stale_files_row(root):
     return (rc if "stale" in out.lower() else -1), 3
 
 
+def t_duplicate_patterns(root):
+    """a repeated glob cannot claim or count the first row's files again"""
+    p = root / "scripts/estate_rules.py"
+    p.write_text(p.read_text() + '''
+PATTERNS.append({"glob": "docs/**.md", "class": "testimonial",
+                 "evidence": "a later duplicate must have no matches",
+                 "note": "unverified-default"})
+''')
+    sh("git", "add", "scripts/estate_rules.py", cwd=root, check=True)
+    rc, _ = check(root, "--write")
+    body = (root / "estate.yaml").read_text()
+    patterns = body.split("\npatterns:\n", 1)[1].split("\nunverified:", 1)[0]
+    counts = [int(n) for n in re.findall(r"^  match_count: (\d+)$", patterns, re.M)]
+    summary = body.split("\nsummary:\n", 1)[1].split("\nfiles:\n", 1)[0]
+    classified = int(re.search(r"classified_files: (\d+)", summary)[1])
+    by_class = [int(n) for n in re.findall(r"^    [a-z-]+: (\d+)$", summary, re.M)]
+    unverified = body.split("\nunverified:\n", 1)[1]
+    ok = (rc == 0 and check(root)[0] == 0 and counts == [2, 1, 0]
+          and sum(by_class) == classified and "docs/" not in unverified)
+    return (0 if ok else -1), 0
+
+
+def derivation_refused(root, suffix, locator):
+    """Both modes refuse invalid rules before --write can alter the manifest."""
+    (root / "scripts/estate_rules.py").write_text(RULES + suffix)
+    sh("git", "add", "scripts/estate_rules.py", cwd=root, check=True)
+    before = (root / "estate.yaml").read_text()
+    for mode in ("--check", "--write"):
+        rc, out = check(root, mode)
+        if rc != 3 or "derivation" not in out or locator not in out or "Traceback" in out:
+            return False
+    return (root / "estate.yaml").read_text() == before
+
+
+def t_missing_derivation(root):
+    """neither derived class may omit its derivation, in files or in patterns"""
+    for name, locator in (("FILES", "scripts/estate.py"), ("PATTERNS", "docs/**.md")):
+        for cls in ("generated", "pinned-copy"):
+            suffix = (f'\n{name}[0]["class"] = {cls!r}\n'
+                      f'{name}[0].pop("derivation", None)\n')
+            if not derivation_refused(root, suffix, locator):
+                return -1, 3
+    return 3, 3
+
+
+def t_malformed_derivation(root):
+    """tool, gate and nonempty input declarations are required, never a traceback"""
+    valid = {"tool": "projector", "gate": "parity", "inputs": ["source"]}
+    bad = [None, {}, "not a mapping"]
+    for field, values in (("tool", (None, "", "  ", 1)),
+                          ("gate", (None, "", "  ", [])),
+                          ("inputs", (None, [], "source", [""], ["  "], [1]))):
+        bad.append({k: v for k, v in valid.items() if k != field})
+        bad.extend(dict(valid, **{field: value}) for value in values)
+    for name, locator in (("FILES", "scripts/estate.py"), ("PATTERNS", "docs/**.md")):
+        for cls in ("generated", "pinned-copy"):
+            for derivation in bad:
+                suffix = (f'\n{name}[0]["class"] = {cls!r}\n'
+                          f'{name}[0]["derivation"] = {derivation!r}\n')
+                if not derivation_refused(root, suffix, locator):
+                    return -1, 3
+    return 3, 3
+
+
+def t_unstaged_deletion(root):
+    """deleting a files: path only on disk cannot invalidate its staged blob"""
+    before = (root / "estate.yaml").read_text()
+    (root / "LICENSE").unlink()
+    rc, out = check(root, "--write")
+    ok = (rc == 0 and check(root)[0] == 0
+          and (root / "estate.yaml").read_text() == before
+          and "modified, not staged" in out and "LICENSE" in out)
+    return (0 if ok else -1), 0
+
+
+def t_staged_deletion(root):
+    """a staged deletion leaves a stale files: row even if disk still has bytes"""
+    sh("git", "rm", "--cached", "LICENSE", cwd=root, check=True)
+    rc, out = check(root)
+    return (rc if "stale" in out.lower() and "LICENSE" in out else -1), 3
+
+
 def t_index_is_the_source(root):
     """a files: row hashes what git STAGED, never what the disk happens to say
 
@@ -261,6 +344,11 @@ CASES = [
     ("claim dies with its evidence", t_evidence_vanishes),
     ("duplicate files: row refused", t_duplicate_files_row),
     ("stale files: row refused", t_stale_files_row),
+    ("duplicate globs obey first-match-wins", t_duplicate_patterns),
+    ("derived rows require derivation", t_missing_derivation),
+    ("malformed derivation refused and named", t_malformed_derivation),
+    ("unstaged deletion preserves staged entry", t_unstaged_deletion),
+    ("staged deletion leaves a stale row", t_staged_deletion),
     ("the index is the source, disk drift named", t_index_is_the_source),
     ("an untracked file is named, not ignored", t_untracked_is_named),
 ]
