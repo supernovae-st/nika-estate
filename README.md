@@ -21,8 +21,12 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="Apache-2.0"></a>
 </p>
 
+<p align="center"><strong>Watch the check refuse one edited file, name the fix, then pass again.</strong></p>
+
 <p align="center">
-  <img src="media/the-bite.gif" alt="estate.py --check reports the manifest in sync; after one staged edit to README.md it refuses and names the command that fixes it; once the edit is undone it is in sync again" width="760">
+  <a href="media/the-bite.gif">
+    <img src="media/the-bite.gif" alt="estate.py --check reports the manifest in sync; after one staged edit to README.md it refuses and names the command that fixes it; once the edit is undone it is in sync again" width="960">
+  </a>
 </p>
 
 <p align="center"><sub>A copy of a real repository (nika-registry) and the shared tool: in sync, one staged edit refused, undone, in sync again. Every verdict is the tool's own output, recorded with <a href="scripts/media/the-bite.tape">the-bite.tape</a>.</sub></p>
