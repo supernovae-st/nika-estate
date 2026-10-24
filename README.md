@@ -238,7 +238,13 @@ self-test proves the opposite half, one planted mistake at a time:
 | The same glob twice | Only the first row claims its files (exit 0) |
 | A deletion, an edit or a new file that is not staged | The manifest keeps describing what is staged, and the tool names each difference (exit 0) |
 
-<!-- motion: selftest.py planting one mistake at a time, each refusal and its exit code -->
+<p align="center">
+  <a href="media/selftest.gif">
+    <img src="media/selftest.gif" alt="python3 scripts/selftest.py runs seventeen cases, each planting one known mistake in a throwaway repository: every case passes with its expected exit code, 0, 3 or 5, and the run ends 17/17" width="860">
+  </a>
+</p>
+
+<p align="center"><sub>Notice the exit codes: drift is 5, a refused rule is 3, and the cases that must stay quiet end in 0. Every line is the self-test's own output, recorded with <a href="scripts/media/selftest.tape">selftest.tape</a>; the throwaway repository lives under a temporary folder.</sub></p>
 
 The self-test is tested too: remove the class check from the tool and one
 case fails, silence the coverage-hole check and one fails, make `--check`
@@ -361,7 +367,7 @@ uncovered.
 | [`OPEN_DEFECTS.md`](OPEN_DEFECTS.md) | The open defect, its reproducer and the bounded follow-up |
 | [`MIGRATION.md`](MIGRATION.md) | How four diverging copies became one tool |
 | [`SUCCESSION.md`](SUCCESSION.md) | Who may advance the record if the maintainer disappears. Keys pending; the clause awaits legal review. Checking the record never depends on it. |
-| [`scripts/media/`](scripts/media) | The tape and the script that record the clip above |
+| [`scripts/media/`](scripts/media) | The tapes and the script that record the clips on this page |
 
 ## Change the tool
 
