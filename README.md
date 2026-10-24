@@ -65,18 +65,26 @@ every tracked file with its kind and its hash. Nobody writes the manifest by
 hand: anyone can regenerate it from the repository and compare the two byte
 for byte. You need Python and git, not anyone's word.
 
-The goal is for every manifest in the ecosystem to fold into **one hash**,
-published where anyone can check it, so the whole ecosystem can be re-checked
-from that single value without trusting any institution, including us.
+The design lets every manifest in the ecosystem fold into **one hash**,
+published where anyone can check it, so the whole ecosystem could be re-checked
+from that single value without trusting any institution, including us. That
+fold is not built: see the note below.
 
 > [!NOTE]
-> **Where it stands today.** Four repositories of the family carry a
-> manifest: nika, nika-spec, nika-docs and nika-registry. The others, this one
-> included, do not yet. Each carrier fails its CI when its copy of the tool
-> differs from the pinned version. The manifests observe rather
-> than enforce: each repository decides which findings block a change. The
-> fold into one hash and its public anchor are the next step and are **not
-> built yet**; this repository's `closure` job is a placeholder until then.
+> **Where it stands today.** Five repositories of the family carry a
+> manifest: nika, nika-spec, nika-docs, nika-registry and nika.sh. The others,
+> this one included, do not. Each carrier fails its CI when its copy of the
+> tool differs from the revision its `ESTATE_PIN` names, but the carriers do
+> not all name the same revision. nika.sh pins the current tool,
+> [`247deb8`](https://github.com/supernovae-st/nika-estate/commit/247deb86220035bed9b276606ce4a2957c5a8d57);
+> nika-spec carries the same bytes under `tools/estate/` and pins one of its
+> own commits; nika, nika-docs and nika-registry still pin a revision from
+> before the 2026-09-08 fix ([#1](https://github.com/supernovae-st/nika-estate/pull/1))
+> that added the derivation checks. The manifests observe rather than enforce:
+> each repository decides which findings block a change. The fold into one
+> hash and its public anchor are **not built**, and no work on them is
+> scheduled while the project is in maintenance; this repository's `closure`
+> job is a placeholder.
 
 ## Try it in one minute
 
@@ -141,10 +149,10 @@ flowchart LR
   D --> P["Proof<br/>the gate re-makes it"]
   A --> M["estate.yaml<br/>kind + hash per file"]
   P --> M
-  M -.-> R["Root hash<br/>(planned)"]
-  R -.-> X["Public anchor<br/>(planned)"]
-  classDef planned stroke-dasharray: 5 5
-  class R,X planned
+  M -.-> R["Root hash<br/>(not built)"]
+  R -.-> X["Public anchor<br/>(not built)"]
+  classDef notbuilt stroke-dasharray: 5 5
+  class R,X notbuilt
 ```
 
 | Step | What it means | Today |
@@ -153,8 +161,8 @@ flowchart LR
 | **Derivation** | A tool made the file from declared inputs, or copied it from a declared source. Classes `generated` and `pinned-copy` must name the tool, the gate and the inputs, or the tool refuses them. | Live |
 | **Proof** | The gate a derivation names re-makes or re-checks the output in that repository's CI. The estate records which gate; it does not run it. | Declared per repository |
 | **Manifest** | `estate.yaml` lists every tracked file with its class and hash. `--check` regenerates it and compares byte for byte. | Live |
-| **Root hash** | Every manifest folded into one hash, kept in an `estate.lock`. | Planned |
-| **Anchor** | That hash published outside the project, checkable with sha256 and a short script. | Planned |
+| **Root hash** | Every manifest folded into one hash, kept in an `estate.lock`. | Not built |
+| **Anchor** | That hash published outside the project, checkable with sha256 and a short script. | Not built |
 
 In the manifest, the two kinds of file are six classes: `authored` and
 `authored-pin` (a person), `generated` and `pinned-copy` (a recorded step),
@@ -278,8 +286,9 @@ request, find the phrase from its message in the first column:
 
 - **It observes.** The manifest declares what each file is. Whether a finding
   blocks a change is each repository's choice.
-- **The single hash is not built yet.** Neither the root hash nor its public
-  anchor exists today.
+- **The single hash is not built.** Neither the root hash nor its public
+  anchor exists, and no work on them is scheduled while the project is in
+  maintenance.
 - **A derivation is checked as a declaration.** The tool checks that `tool`,
   `gate` and `inputs` are present and well formed, not that the gate runs or
   that the inputs are hashed.
@@ -322,10 +331,15 @@ classifies itself before it is first added.
 <details>
 <summary><strong>Why the tool lives here, and nowhere else</strong></summary>
 
-[`scripts/estate.py`](scripts/estate.py) is the one implementation. Every
-repository that carries an estate runs a byte-identical copy, pinned by its
-`ESTATE_PIN`; only the rules in `scripts/estate_rules.py` differ, because
-they describe that repository. The tool uses the Python standard library
+[`scripts/estate.py`](scripts/estate.py) is the one implementation, and
+changes to it land here. Every repository that carries an estate runs a copy
+that is byte-identical to the revision its `ESTATE_PIN` names; only the rules
+in `scripts/estate_rules.py` differ, because they describe that repository.
+nika-spec also publishes the current tool under
+`tools/estate/scripts/estate.py`, and its `ESTATE_PIN` names that spec commit
+instead of a revision here; the bytes are those of `247deb8`. Until nika,
+nika-docs and nika-registry move their pins, two revisions of the tool are in
+use (see [where it stands today](#provenance-in-plain-words)). The tool uses the Python standard library
 alone, so a stock interpreter can still run it decades from now, with no
 package manager to depend on.
 
