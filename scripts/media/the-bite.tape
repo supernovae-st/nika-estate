@@ -1,9 +1,11 @@
 # the-bite.tape — the hundred-year machinery in ~14 seconds: the ledger
 # agrees with the tree, a staged edit diverges it, the gate refuses
 # loud, the restore brings it back. Recorded on a real carrier repo
-# (nika-registry, byte-identical shared tool); scripts/media/render.sh
-# stages the copy. House theme = the engine's nika-hero palette + the
-# v2 window chrome.
+# (nika-registry) with that repo's own copy of the tool, so a render shows
+# the revision its ESTATE_PIN names: media/the-bite.gif was recorded with
+# revision 6043247 (2026-07-31), from before the derivation checks of
+# 247deb8. scripts/media/render.sh stages the copy. House theme = the
+# engine's nika-hero palette + the v2 window chrome.
 Output the-bite.gif
 
 Set Shell zsh

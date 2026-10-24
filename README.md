@@ -29,7 +29,7 @@
   </a>
 </p>
 
-<p align="center"><sub>A copy of a real repository (nika-registry) and the shared tool: in sync, one staged edit refused, undone, in sync again. Every verdict is the tool's own output, recorded with <a href="scripts/media/the-bite.tape">the-bite.tape</a>.</sub></p>
+<p align="center"><sub>A copy of a real repository (nika-registry) and its copy of the tool, revision <a href="https://github.com/supernovae-st/nika-estate/commit/604324752f9db470b9e83ecbb5f31b0da65641a7"><code>6043247</code></a> (2026-07-31), from before the derivation checks: in sync, one staged edit refused, undone, in sync again. Every verdict is that revision's own output, recorded with <a href="scripts/media/the-bite.tape">the-bite.tape</a>.</sub></p>
 
 ## What is Nika?
 
