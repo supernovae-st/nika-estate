@@ -71,14 +71,17 @@ from that single value without trusting any institution, including us. That
 fold is not built: see the note below.
 
 > [!NOTE]
-> **Where it stands today.** Five repositories of the family carry a
-> manifest: nika, nika-spec, nika-docs, nika-registry and nika.sh. The others,
-> this one included, do not. Each carrier fails its CI when its copy of the
-> tool differs from the revision its `ESTATE_PIN` names, but the carriers do
-> not all name the same revision. nika.sh pins the current tool,
-> [`247deb8`](https://github.com/supernovae-st/nika-estate/commit/247deb86220035bed9b276606ce4a2957c5a8d57);
-> nika-spec carries the same bytes under `tools/estate/` and pins one of its
-> own commits; nika, nika-docs and nika-registry still pin a revision from
+> **Where it stands today.** Four public repositories carry a manifest
+> (nika, nika-spec, nika-docs and nika-registry), and so does the private
+> nika.sh site repository, whose manifest cannot be re-checked from outside.
+> The other repositories of the family, this one included, do not. Each
+> carrier fails its CI when its copy of the tool differs from the revision
+> its `ESTATE_PIN` names, but the carriers do not all name the same
+> revision. nika.sh pins the current tool,
+> [`247deb8`](https://github.com/supernovae-st/nika-estate/commit/247deb86220035bed9b276606ce4a2957c5a8d57),
+> a pin only the organization can see; nika-spec carries the same bytes
+> under `tools/estate/` and pins one of its own commits; nika, nika-docs
+> and nika-registry still pin a revision from
 > before the 2026-09-08 fix ([#1](https://github.com/supernovae-st/nika-estate/pull/1))
 > that added the derivation checks. The manifests observe rather than enforce:
 > each repository decides which findings block a change. The fold into one
