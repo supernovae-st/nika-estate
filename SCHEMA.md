@@ -70,8 +70,9 @@ The rules:
 ## The classes
 
 The six words below are the law. They live **here** and nowhere else:
-`scripts/estate.py` carries them verbatim in its `CLASSES` dict, and every
-repo runs a byte-identical copy of that file. A repo that re-words a
+`scripts/estate.py` carries them verbatim in its `CLASSES` dict, every
+carrying repo runs a copy byte-identical to the revision its `ESTATE_PIN`
+names, and every pinned revision carries the same `CLASSES`. A repo that re-words a
 definition to fit its own domain has forked the law without saying so, which
 is the exact failure this document exists to prevent. (It happened: on
 2026-07-29 three different wordings of `pinned-copy` and `testimonial` were

@@ -29,7 +29,7 @@
   </a>
 </p>
 
-<p align="center"><sub>A copy of a real repository (nika-registry) and the shared tool: in sync, one staged edit refused, undone, in sync again. Every verdict is the tool's own output, recorded with <a href="scripts/media/the-bite.tape">the-bite.tape</a>.</sub></p>
+<p align="center"><sub>A copy of a real repository (nika-registry) and its copy of the tool, revision <a href="https://github.com/supernovae-st/nika-estate/commit/604324752f9db470b9e83ecbb5f31b0da65641a7"><code>6043247</code></a> (2026-07-31), from before the derivation checks: in sync, one staged edit refused, undone, in sync again. Every verdict is that revision's own output, recorded with <a href="scripts/media/the-bite.tape">the-bite.tape</a>.</sub></p>
 
 ## What is Nika?
 
@@ -65,18 +65,29 @@ every tracked file with its kind and its hash. Nobody writes the manifest by
 hand: anyone can regenerate it from the repository and compare the two byte
 for byte. You need Python and git, not anyone's word.
 
-The goal is for every manifest in the ecosystem to fold into **one hash**,
-published where anyone can check it, so the whole ecosystem can be re-checked
-from that single value without trusting any institution, including us.
+The design lets every manifest in the ecosystem fold into **one hash**,
+published where anyone can check it, so the whole ecosystem could be re-checked
+from that single value without trusting any institution, including us. That
+fold is not built: see the note below.
 
 > [!NOTE]
-> **Where it stands today.** Four repositories of the family carry a
-> manifest: nika, nika-spec, nika-docs and nika-registry. The others, this one
-> included, do not yet. Each carrier fails its CI when its copy of the tool
-> differs from the pinned version. The manifests observe rather
-> than enforce: each repository decides which findings block a change. The
-> fold into one hash and its public anchor are the next step and are **not
-> built yet**; this repository's `closure` job is a placeholder until then.
+> **Where it stands today.** Four public repositories carry a manifest
+> (nika, nika-spec, nika-docs and nika-registry), and so does the private
+> nika.sh site repository, whose manifest cannot be re-checked from outside.
+> The other repositories of the family, this one included, do not. Each
+> carrier fails its CI when its copy of the tool differs from the revision
+> its `ESTATE_PIN` names, but the carriers do not all name the same
+> revision. nika.sh pins the current tool,
+> [`247deb8`](https://github.com/supernovae-st/nika-estate/commit/247deb86220035bed9b276606ce4a2957c5a8d57),
+> a pin only the organization can see; nika-spec carries the same bytes
+> under `tools/estate/` and pins one of its own commits; nika, nika-docs
+> and nika-registry still pin a revision from
+> before the 2026-09-08 fix ([#1](https://github.com/supernovae-st/nika-estate/pull/1))
+> that added the derivation checks. The manifests observe rather than enforce:
+> each repository decides which findings block a change. The fold into one
+> hash and its public anchor are **not built**, and no work on them is
+> scheduled while the project is in maintenance; this repository's `closure`
+> job is a placeholder.
 
 ## Try it in one minute
 
@@ -141,10 +152,10 @@ flowchart LR
   D --> P["Proof<br/>the gate re-makes it"]
   A --> M["estate.yaml<br/>kind + hash per file"]
   P --> M
-  M -.-> R["Root hash<br/>(planned)"]
-  R -.-> X["Public anchor<br/>(planned)"]
-  classDef planned stroke-dasharray: 5 5
-  class R,X planned
+  M -.-> R["Root hash<br/>(not built)"]
+  R -.-> X["Public anchor<br/>(not built)"]
+  classDef notbuilt stroke-dasharray: 5 5
+  class R,X notbuilt
 ```
 
 | Step | What it means | Today |
@@ -153,8 +164,8 @@ flowchart LR
 | **Derivation** | A tool made the file from declared inputs, or copied it from a declared source. Classes `generated` and `pinned-copy` must name the tool, the gate and the inputs, or the tool refuses them. | Live |
 | **Proof** | The gate a derivation names re-makes or re-checks the output in that repository's CI. The estate records which gate; it does not run it. | Declared per repository |
 | **Manifest** | `estate.yaml` lists every tracked file with its class and hash. `--check` regenerates it and compares byte for byte. | Live |
-| **Root hash** | Every manifest folded into one hash, kept in an `estate.lock`. | Planned |
-| **Anchor** | That hash published outside the project, checkable with sha256 and a short script. | Planned |
+| **Root hash** | Every manifest folded into one hash, kept in an `estate.lock`. | Not built |
+| **Anchor** | That hash published outside the project, checkable with sha256 and a short script. | Not built |
 
 In the manifest, the two kinds of file are six classes: `authored` and
 `authored-pin` (a person), `generated` and `pinned-copy` (a recorded step),
@@ -230,7 +241,13 @@ self-test proves the opposite half, one planted mistake at a time:
 | The same glob twice | Only the first row claims its files (exit 0) |
 | A deletion, an edit or a new file that is not staged | The manifest keeps describing what is staged, and the tool names each difference (exit 0) |
 
-<!-- motion: selftest.py planting one mistake at a time, each refusal and its exit code -->
+<p align="center">
+  <a href="media/selftest.gif">
+    <img src="media/selftest.gif" alt="python3 scripts/selftest.py runs seventeen cases, each planting one known mistake in a throwaway repository: every case passes with its expected exit code, 0, 3 or 5, and the run ends 17/17" width="860">
+  </a>
+</p>
+
+<p align="center"><sub>Notice the exit codes: drift is 5, a refused rule is 3, and the cases that must stay quiet end in 0. Every line is the self-test's own output, recorded with <a href="scripts/media/selftest.tape">selftest.tape</a>; the throwaway repository lives under a temporary folder.</sub></p>
 
 The self-test is tested too: remove the class check from the tool and one
 case fails, silence the coverage-hole check and one fails, make `--check`
@@ -278,8 +295,9 @@ request, find the phrase from its message in the first column:
 
 - **It observes.** The manifest declares what each file is. Whether a finding
   blocks a change is each repository's choice.
-- **The single hash is not built yet.** Neither the root hash nor its public
-  anchor exists today.
+- **The single hash is not built.** Neither the root hash nor its public
+  anchor exists, and no work on them is scheduled while the project is in
+  maintenance.
 - **A derivation is checked as a declaration.** The tool checks that `tool`,
   `gate` and `inputs` are present and well formed, not that the gate runs or
   that the inputs are hashed.
@@ -322,10 +340,15 @@ classifies itself before it is first added.
 <details>
 <summary><strong>Why the tool lives here, and nowhere else</strong></summary>
 
-[`scripts/estate.py`](scripts/estate.py) is the one implementation. Every
-repository that carries an estate runs a byte-identical copy, pinned by its
-`ESTATE_PIN`; only the rules in `scripts/estate_rules.py` differ, because
-they describe that repository. The tool uses the Python standard library
+[`scripts/estate.py`](scripts/estate.py) is the one implementation, and
+changes to it land here. Every repository that carries an estate runs a copy
+that is byte-identical to the revision its `ESTATE_PIN` names; only the rules
+in `scripts/estate_rules.py` differ, because they describe that repository.
+nika-spec also publishes the current tool under
+`tools/estate/scripts/estate.py`, and its `ESTATE_PIN` names that spec commit
+instead of a revision here; the bytes are those of `247deb8`. Until nika,
+nika-docs and nika-registry move their pins, two revisions of the tool are in
+use (see [where it stands today](#provenance-in-plain-words)). The tool uses the Python standard library
 alone, so a stock interpreter can still run it decades from now, with no
 package manager to depend on.
 
@@ -347,7 +370,7 @@ uncovered.
 | [`OPEN_DEFECTS.md`](OPEN_DEFECTS.md) | The open defect, its reproducer and the bounded follow-up |
 | [`MIGRATION.md`](MIGRATION.md) | How four diverging copies became one tool |
 | [`SUCCESSION.md`](SUCCESSION.md) | Who may advance the record if the maintainer disappears. Keys pending; the clause awaits legal review. Checking the record never depends on it. |
-| [`scripts/media/`](scripts/media) | The tape and the script that record the clip above |
+| [`scripts/media/`](scripts/media) | The tapes and the script that record the clips on this page |
 
 ## Change the tool
 
@@ -375,7 +398,7 @@ nika-estate follows the organization's
 | 🦋 | [nika](https://github.com/supernovae-st/nika) | The engine and CLI: write, check, run and verify AI workflows |
 | 📖 | [nika-docs](https://github.com/supernovae-st/nika-docs) | The documentation, live at [docs.nika.sh](https://docs.nika.sh) |
 | 📜 | [nika-spec](https://github.com/supernovae-st/nika-spec) | The language specification and the suite that proves an engine follows it |
-| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension: your workflow as a live graph, errors as you type |
+| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension, frozen at 0.120 and not qualified with 0.123: use `nika lsp` and the JSON Schema |
 | 🟦 | [nika-client](https://github.com/supernovae-st/nika-client) | Run and verify workflows from TypeScript |
 | ✅ | [nika-action](https://github.com/supernovae-st/nika-action) | A GitHub Action that posts a `nika check` verdict on your pull requests |
 | 🚀 | [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) | A ready template: workflows, editor setup and CI from the first push |
